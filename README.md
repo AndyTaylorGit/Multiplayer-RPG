@@ -1,6 +1,15 @@
 # Multiplayer-RPG
 Base code was downloaded from: [Rawkes](http://rawkes.com/articles/creating-a-real-time-multiplayer-game-with-websockets-and-node.html) (After following the tutorial)
 
+#### TODO
+- Fix bug leaving player 'ghosts' (can be fixed by refreshing page)
+- Make player face movement direction
+- Make the sword.. do sword stuff
+- Add enemies ^
+- Add screen prompting you to enter the ip
+- Disallow player movement before connection to the server is established
+- More textures more awesome
+
 *Sorry for the huge gifs!*
 
 **Original Game: (It did have multiple squares, but I broke something)**
