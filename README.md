@@ -1,5 +1,6 @@
 # Multiplayer-RPG
-Base code was downloaded from: [Rawkes](http://rawkes.com/articles/creating-a-real-time-multiplayer-game-with-websockets-and-node.html) (After following the tutorial)
+Base code was downloaded from: [Rawkes](http://rawkes.com/articles/creating-a-real-time-multiplayer-game-with-websockets-and-node.html) (After following the tutorial)        
+Credit to the sprite maker: [Reddit Page](https://www.reddit.com/r/PixelArt/comments/23m4hs/ocwipcc_some_rpgdungeon_crawler_sprites_im/) (Some tweaks were made for sizing)
 
 #### TODO
 - Fix bug leaving player 'ghosts' (can be fixed by refreshing page)
