@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+	<head>
+		<title>Multiplayer RPG</title>
+		<meta charset="utf-8">
+		
+		<link rel="stylesheet" href="style/reset.css">
+		<link rel="stylesheet" href="style/game.css">
+	</head>
+	
+	<body>
+		<canvas id="gameCanvas"></canvas>
+		<script src="http://192.168.0.108:8000/socket.io/socket.io.js"></script>
+		<script src="js/requestAnimationFrame.js"></script>
+		<script src="js/Keys.js"></script>
+		<script src="js/Player.js"></script>
+		<script src="js/game.js"></script>
+		<script src="js/Wall.js"></script>
+		<script>
+			// Initialise the game
+			init();
+			animate();
+		</script>
+	</body>
+</html>
