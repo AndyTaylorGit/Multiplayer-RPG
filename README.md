@@ -34,4 +34,4 @@ The second is to set up a server clients can connect to. This can be achieved by
 
     python -m SimpleHTTPServer 8080
 
-Now connecting to your localhost (or ip or you can port-forward) specifying the port :8080 (:8000 takes you to the socket.io server) should give you the client page.
+Now connecting to your localhost (or ip or you can port-forward) and specifying the port :8080 (:8000 takes you to the socket.io server) should give you the client page.
