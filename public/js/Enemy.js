@@ -5,10 +5,6 @@ var Player = function(startX, startY) {
 	var x = startX,
 		y = startY,
 		moveAmount = 50,
-		leftPressed = false,
-		rightPressed = false,
-		upPressed = false,
-		downPressed = false,
 		attacking = false,
 		prevAttacking = false,
 		id = -1,
@@ -65,14 +61,7 @@ var Player = function(startX, startY) {
 		prevX = ret[0];
 		prevY = ret[1];
 		
-		// Can't hold the keys to move
-		if (!keys.left){ leftPressed = false; }
-		if (!keys.right){ rightPressed = false; }
-		if (!keys.up){ upPressed = false; }
-		if (!keys.down){ downPressed = false; }
 		
-		if (keys.space){ attacking = true; }
-		else { attacking = false; }
 		
 		// OOB checking
 		if (y > 500){ y = 500; }
@@ -82,6 +71,7 @@ var Player = function(startX, startY) {
 		
 		var move = false, 
 			att = false;
+			
 		if (prevX != x || prevY != y){ move = true; }
 		if (prevAttack != attacking){ att = true; }
 		
@@ -114,23 +104,7 @@ var Player = function(startX, startY) {
 	}
 	
 	var movement = function(){
-		// Up key takes priority over down
-		if (keys.up && !upPressed) {
-			y -= moveAmount;
-			upPressed = true;
-		} else if (keys.down && !downPressed) {
-			y += moveAmount;
-			downPressed = true;
-		};
-
-		// Left key takes priority over right
-		if (keys.left && !leftPressed) {
-			x -= moveAmount;
-			leftPressed = true;
-		} else if (keys.right && !rightPressed) {
-			x += moveAmount;
-			rightPressed = true;
-		};
+		
 	}
 
 	// Draw player

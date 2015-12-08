@@ -77,6 +77,8 @@ var setEventHandlers = function() {
 	
 	// Player is attacking
 	socket.on("attack player", attackPlayer);
+	
+	socket.on("set local id", setLocalID);
 };
 
 function attackPlayer(data){
@@ -120,9 +122,15 @@ function onSocketConnected() {
 	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY()});
 };
 
+function setLocalID(data) {
+	localPlayer.setId(data.id);
+}
+
 // Socket disconnected
 function onSocketDisconnect() {
 	console.log("Disconnected from socket server");
+	remotePlayers = [];
+	all_objects = [];
 };
 
 function newWall(data){
@@ -137,8 +145,13 @@ function onNewPlayer(data) {
 
 	// Initialise the new player
 	var newPlayer = new Player(data.x, data.y);
-	newPlayer.id = data.id;
-
+	newPlayer.setId(data.id);
+	
+	for (var i = 0; i < remotePlayers.length; i++){
+		if (newPlayer.getId() == remotePlayers[i].getId()){
+			return;
+		}
+	}
 	// Add new player to the remote players array
 	remotePlayers.push(newPlayer);
 };
@@ -146,11 +159,14 @@ function onNewPlayer(data) {
 // Move player
 function onMovePlayer(data) {
 	var movePlayer = playerById(data.id);
-
+	
 	// Player not found
 	if (!movePlayer) {
-		console.log("Player not found: "+data.id);
-		return;
+		if (data.id == localPlayer.getId()){ movePlayer = localPlayer; }
+		else {
+			console.log("Player not found: "+data.id);
+			return;
+		}
 	};
 
 	// Update player position
@@ -238,7 +254,7 @@ function draw() {
 function playerById(id) {
 	var i;
 	for (i = 0; i < remotePlayers.length; i++) {
-		if (remotePlayers[i].id == id)
+		if (remotePlayers[i].getId() == id)
 			return remotePlayers[i];
 	};
 	

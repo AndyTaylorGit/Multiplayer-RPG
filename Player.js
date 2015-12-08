@@ -4,6 +4,7 @@
 var Player = function(startX, startY) {
 	var x = startX,
 		y = startY,
+		attacking = false,
 		id;
 
 	// Getters and setters
@@ -22,6 +23,14 @@ var Player = function(startX, startY) {
 	var setY = function(newY) {
 		y = newY;
 	};
+	
+	var getAttacking = function(){
+		return attacking;
+	}
+	
+	var setAttacking = function(att){
+		attacking = att;
+	}
 
 	// Define which variables and methods can be accessed
 	return {
@@ -29,6 +38,8 @@ var Player = function(startX, startY) {
 		getY: getY,
 		setX: setX,
 		setY: setY,
+		getAttacking: getAttacking,
+		setAttacking: setAttacking,
 		id: id
 	}
 };

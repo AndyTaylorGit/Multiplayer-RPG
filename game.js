@@ -10,7 +10,9 @@ var util = require("util"),					// Utility resources (logging, object inspection
 ** GAME VARIABLES
 **************************************************/
 var socket,		// Socket controller
-	players;	// Array of connected players
+	players,
+	all_objects,
+	walls;	// Array of connected players
 
 
 /**************************************************
@@ -19,6 +21,7 @@ var socket,		// Socket controller
 function init() {
 	// Create an empty array to store players
 	players = [];
+	walls = [];
 
 	// Set up Socket.IO to listen on port 8000
 	socket = io.listen(8000);
@@ -70,6 +73,21 @@ function attackPlayer(data) {
 	};
 	
 	this.broadcast.emit("attack player", {id: attackPlayer.id, attack: data.attack});
+	
+	attackPlayer.setAttacking(data.attack);
+	if (data.attack){
+		for (var i = 0; i < players.length; i++){
+			var player = players[i];
+			if (player.id == this.id){ continue; }
+			if (player.getY() == attackPlayer.getY() && player.getX()-50 == attackPlayer.getX()){
+				player.setX(250);
+				player.setY(500);
+				this.broadcast.emit("move player", {id: player.id, x: 250, y:500});
+				this.emit("move player", {id: player.id, x: 250, y:500});
+				break;
+			}
+		}
+	}
 }
 
 // Socket client has disconnected
@@ -96,6 +114,8 @@ function onNewPlayer(data) {
 	// Create a new player
 	var newPlayer = new Player(data.x, data.y);
 	newPlayer.id = this.id;
+	
+	this.emit("set local id", {id: this.id});
 
 	// Broadcast new player to connected socket clients
 	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY()});
