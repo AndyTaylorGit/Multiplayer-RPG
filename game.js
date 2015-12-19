@@ -3,7 +3,9 @@
 **************************************************/
 var util = require("util"),					// Utility resources (logging, object inspection, etc)
 	io = require("socket.io"),				// Socket.IO
-	Player = require("./Player").Player;	// Player class
+	Player = require("./Player").Player,
+	Enemy = require("./Enemy").Enemy,
+	Wall = require("./Wall").Wall;
 
 
 /**************************************************
@@ -11,8 +13,7 @@ var util = require("util"),					// Utility resources (logging, object inspection
 **************************************************/
 var socket,		// Socket controller
 	players,
-	all_objects,
-	walls;	// Array of connected players
+	all_objects;	// Array of connected players
 
 
 /**************************************************
@@ -21,23 +22,32 @@ var socket,		// Socket controller
 function init() {
 	// Create an empty array to store players
 	players = [];
-	walls = [];
+	all_objects = [];
 
 	// Set up Socket.IO to listen on port 8000
 	socket = io.listen(8000);
 
-	// Configure Socket.IO
-	/*socket.configure(function() {
-		// Only use WebSockets
-		socket.set("transports", ["websocket"]);
-
-		// Restrict log output
-		socket.set("log level", 2);
-	});*/
+	all_objects.push(new Wall(100, 100));
+	all_objects.push(new Wall(150, 100));
+	all_objects.push(new Wall(100, 150));
+	all_objects.push(new Enemy(250, 250, 20001));
 
 	// Start listening for events
 	setEventHandlers();
+	setInterval(update, 500);
 };
+
+function update() {
+	for (var i = 0; i < all_objects.length; i++){
+		var object = all_objects[i];
+		if (object.getClass() == "enemy"){
+			var move = object.update(players, all_objects);
+			if (move) {
+				socket.sockets.emit("move enemy", {x: object.getX(), y: object.getY(), id: object.getId()});
+			}
+		}
+	}
+}
 
 
 /**************************************************
@@ -127,10 +137,15 @@ function onNewPlayer(data) {
 		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY()});
 	};
 	
-	// Send walls
-	this.emit("new wall", {x: 50, y: 50});
-	this.emit("new wall", {x: 100, y: 50});
-	this.emit("new wall", {x: 50, y: 100});
+	for (i = 0; i < all_objects.length; i++){
+		var object = all_objects[i];
+		util.log(object.getClass());
+		if (object.getClass() == "wall"){
+			this.emit("new wall", {x: object.getX(), y: object.getY()});
+		} else if (object.getClass() == "enemy"){
+			this.emit("new enemy", {x: object.getX(), y: object.getY(), id: object.getId()});
+		}
+	}
 		
 	// Add new player to the players array
 	players.push(newPlayer);

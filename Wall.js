@@ -22,6 +22,14 @@ var Wall = function(startX, startY) {
 	var setY = function(newY) {
 		y = newY;
 	};
+	
+	var getId = function() {
+		return -1;
+	}
+	
+	var getClass = function(){
+		return "wall";
+	}
 
 	// Define which variables and methods can be accessed
 	return {
@@ -29,7 +37,9 @@ var Wall = function(startX, startY) {
 		getY: getY,
 		setX: setX,
 		setY: setY,
-		id: id
+		getId: getId,
+		id: id,
+		getClass: getClass
 	}
 };
 

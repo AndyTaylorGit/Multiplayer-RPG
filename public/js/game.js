@@ -75,11 +75,30 @@ var setEventHandlers = function() {
 	// New wall
 	socket.on("new wall", newWall);
 	
+	// New Enemy
+	socket.on("new enemy", newEnemy);
+	
+	socket.on("move enemy", moveEnemy);
+	
 	// Player is attacking
 	socket.on("attack player", attackPlayer);
 	
 	socket.on("set local id", setLocalID);
 };
+
+function newEnemy(data){
+	var e = new Enemy(data.x, data.y, data.id);
+	
+	all_objects.push(e);
+}
+
+function moveEnemy(data){
+	var object = objectById(data.id);
+	if (object == null){ return; }
+	
+	object.setX(data.x);
+	object.setY(data.y);
+}
 
 function attackPlayer(data){
 	var attackPlayer = playerById(data.id);
@@ -260,3 +279,15 @@ function playerById(id) {
 	
 	return false;
 };
+
+function objectById(id){
+	for (var i = 0; i < all_objects.length; i++){
+		try {
+			if (all_objects[i].getId() == id){
+				return all_objects[i];
+			}
+		} catch (err) { 
+			
+		}
+	}
+}
