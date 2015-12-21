@@ -79,6 +79,8 @@ var setEventHandlers = function() {
 	socket.on("new enemy", newEnemy);
 	
 	socket.on("move enemy", moveEnemy);
+    
+    socket.on("damage object", damageObject);
 	
 	// Player is attacking
 	socket.on("attack player", attackPlayer);
@@ -88,13 +90,14 @@ var setEventHandlers = function() {
 
 function newEnemy(data){
 	var e = new Enemy(data.x, data.y, data.id);
-	
-	all_objects.push(e);
+	if (e.takeDamage(e.getMaxHealth() - data.health)){
+        all_objects.push(e);   
+    }
 }
 
 function moveEnemy(data){
 	var object = objectById(data.id);
-	if (object == null){ return; }
+	if (!object){ return; }
 	
 	object.setX(data.x);
 	object.setY(data.y);
@@ -132,6 +135,14 @@ function onResize(e) {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 };
+
+function damageObject(data) {
+    var o = objectById(data.id);
+    if (!o){ console.log("Can't find object to be damaged"); return; }
+    if (!o.takeDamage(data.damage)){
+        all_objects.pop(o);
+    }
+}
 
 // Socket connected
 function onSocketConnected() {
@@ -191,6 +202,7 @@ function onMovePlayer(data) {
 	// Update player position
 	movePlayer.setX(data.x);
 	movePlayer.setY(data.y);
+    movePlayer.setFacing(data.facing);
 };
 
 // Remove player
@@ -226,8 +238,8 @@ function animate() {
 function update() {
 	// Update local player and check for change
 	var ret = localPlayer.update(keys, remotePlayers)
-	if (ret[0]) {
-		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
+	if (ret[0] || ret[2]) {
+		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), facing: localPlayer.getFacing()});
 	} else if (ret[1]) {
 		socket.emit("attack player", {attack: localPlayer.getAttacking()});
 	}
@@ -290,4 +302,5 @@ function objectById(id){
 			
 		}
 	}
+    return false;
 }

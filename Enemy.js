@@ -4,6 +4,8 @@ var Enemy = function(startX, startY, ID) {
 		moveAmount = 50,
 		attacking = false,
 		prevAttacking = false,
+        health = 30,
+        maxHealth = 30,
 		id = ID;
 	
 	// Getters and setters
@@ -42,6 +44,20 @@ var Enemy = function(startX, startY, ID) {
 	var getClass = function() {
 		return "enemy";
 	}
+    
+    var getHealth = function() {
+        return health;
+    }
+    
+    var takeDamage = function(dam) {
+        health -= dam;
+        if (health < 0){ return false; }
+        return true;
+    }
+    
+    var getMaxHealth = function() {
+        return maxHealth;
+    }
 
 	// Update player position
 	var update = function(players, objects) {
@@ -124,6 +140,9 @@ var Enemy = function(startX, startY, ID) {
 		update: update,
 		setId: setId,
 		getClass: getClass,
+        getHealth: getHealth,
+        takeDamage: takeDamage,
+        getMaxHealth: getMaxHealth,
 		getId: getId
 	}
 };

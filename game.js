@@ -13,7 +13,8 @@ var util = require("util"),					// Utility resources (logging, object inspection
 **************************************************/
 var socket,		// Socket controller
 	players,
-	all_objects;	// Array of connected players
+	all_objects,
+    objectID = 2000;	// Array of connected players
 
 
 /**************************************************
@@ -27,10 +28,10 @@ function init() {
 	// Set up Socket.IO to listen on port 8000
 	socket = io.listen(8000);
 
-	all_objects.push(new Wall(100, 100));
-	all_objects.push(new Wall(150, 100));
-	all_objects.push(new Wall(100, 150));
-	all_objects.push(new Enemy(250, 250, 20001));
+	all_objects.push(new Wall(50, 50));
+	all_objects.push(new Wall(100, 50));
+	all_objects.push(new Wall(50, 100));
+	all_objects.push(new Enemy(100, 100, newObjectID()));
 
 	// Start listening for events
 	setEventHandlers();
@@ -97,6 +98,19 @@ function attackPlayer(data) {
 				break;
 			}
 		}
+        
+        for (var i = 0; i < all_objects.length; i++){
+            var o = all_objects[i];
+            if (o.getClass() == "wall"){ continue; }
+            if (o.getClass() == "enemy"){
+                    if (attackPlayer.getY() == o.getY() && attackPlayer.getX() == o.getX()-(50*attackPlayer.getFacing())){
+                    if (!o.takeDamage(10)){
+                        all_objects.pop(o);
+                    }
+                    socket.sockets.emit("damage object", {id: o.getId(), damage: 10});
+                }
+            }
+        }
 	}
 }
 
@@ -143,7 +157,7 @@ function onNewPlayer(data) {
 		if (object.getClass() == "wall"){
 			this.emit("new wall", {x: object.getX(), y: object.getY()});
 		} else if (object.getClass() == "enemy"){
-			this.emit("new enemy", {x: object.getX(), y: object.getY(), id: object.getId()});
+			this.emit("new enemy", {x: object.getX(), y: object.getY(), health: object.getHealth(), id: object.getId()});
 		}
 	}
 		
@@ -165,9 +179,11 @@ function onMovePlayer(data) {
 	// Update player position
 	movePlayer.setX(data.x);
 	movePlayer.setY(data.y);
+    
+    movePlayer.setFacing(data.facing);
 
 	// Broadcast updated position to connected socket clients
-	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
+	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), facing: movePlayer.getFacing()});
 };
 
 
@@ -184,6 +200,11 @@ function playerById(id) {
 	
 	return false;
 };
+
+function newObjectID() {
+    objectID += 1;
+    return objectID;
+}
 
 
 /**************************************************

@@ -7,6 +7,8 @@ var Enemy = function(startX, startY, ID) {
 		moveAmount = 50,
 		attacking = false,
 		id = ID,
+        health = 30,
+        maxHealth = 30,
 		img,
 		attackImg;
 		
@@ -47,11 +49,26 @@ var Enemy = function(startX, startY, ID) {
 	var getAttacking = function() {
 		return attacking;
 	};
+    
+    var getHealth = function() {
+        return health;
+    }
+    
+    var takeDamage = function(damage) {
+        health -= damage;
+        if (health <= 0){ return false; }
+        return true;
+    }
+    
+    var getMaxHealth = function() {
+        return maxHealth;
+    }
 
-	// Draw player
 	var draw = function(ctx) {
 		var i = img;
 		ctx.drawImage(i, x+1, y+1);
+        ctx.fillStyle="#FF0000";
+        ctx.fillRect(x+1, y+1, (48/30)*health, 10);
 	};
 
 	// Define which variables and methods can be accessed
@@ -63,6 +80,9 @@ var Enemy = function(startX, startY, ID) {
 		setAttacking: setAttacking,
 		getAttacking: getAttacking,
 		draw: draw,
+        getHealth: getHealth,
+        takeDamage: takeDamage,
+        getMaxHealth: getMaxHealth,
 		setId: setId,
 		getId: getId
 	}

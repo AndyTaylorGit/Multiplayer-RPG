@@ -12,18 +12,33 @@ var Player = function(startX, startY) {
 		attacking = false,
 		prevAttacking = false,
 		id = -1,
+        facing = 1,
 		img,
-		attackImg;
+        img_l,
+		attackImg,
+        attackImg_l;
 		
 	img = new Image();
+    img_l = new Image();
 	attackImg = new Image();
+    attackImg_l = new Image();
 	img.src = "pics/hero.png";
+    img_l.src = "pics/hero-l.png";
 	attackImg.src = "pics/hero attack.png";
+    attackImg_l.src = "pics/hero attack-l.png";
 	
 	// Getters and setters
 	var getX = function() {
 		return x;
 	};
+    
+    var getFacing = function() {
+        return facing;
+    }
+    
+    var setFacing = function(f){
+        facing = f;
+    }
 
 	var getY = function() {
 		return y;
@@ -58,6 +73,7 @@ var Player = function(startX, startY) {
 		// Previous position
 		var prevX = x,
 			prevY = y,
+            prevFacing = facing,
 			prevAttack = attacking;
 
 		movement();
@@ -81,11 +97,13 @@ var Player = function(startX, startY) {
 		else if (x < 0){ x = 0; }
 		
 		var move = false, 
+            changeFace = false,
 			att = false;
 		if (prevX != x || prevY != y){ move = true; }
 		if (prevAttack != attacking){ att = true; }
+        if (prevFacing != facing){ changeFace = true; }
 		
-		return [move, att];
+		return [move, att, changeFace];
 	};
 	
 	var collision = function(x2, y2){
@@ -127,17 +145,27 @@ var Player = function(startX, startY) {
 		if (keys.left && !leftPressed) {
 			x -= moveAmount;
 			leftPressed = true;
+            setFacing(-1);
 		} else if (keys.right && !rightPressed) {
 			x += moveAmount;
 			rightPressed = true;
+            setFacing(1);
 		};
 	}
 
 	// Draw player
 	var draw = function(ctx) {
-		var i = img;
-		if (attacking){ i = attackImg; }
-		ctx.drawImage(i, x, y);
+        var i;
+        if (facing == 1){
+            i = img;
+		    if (attacking){ i = attackImg; }
+        } else {
+            i = img_l;
+            if (attacking){ i = attackImg_l; }
+        }
+		var diff = 0;
+        if (facing == -1){ diff = 21; }
+		ctx.drawImage(i, x-diff, y);
 	};
 
 	// Define which variables and methods can be accessed
@@ -149,6 +177,8 @@ var Player = function(startX, startY) {
 		setAttacking: setAttacking,
 		getAttacking: getAttacking,
 		update: update,
+        getFacing: getFacing,
+        setFacing: setFacing,
 		draw: draw,
 		setId: setId,
 		getId: getId
