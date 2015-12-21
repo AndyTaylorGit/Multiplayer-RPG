@@ -3,8 +3,13 @@ Base code was downloaded from: [Rawkes](http://rawkes.com/articles/creating-a-re
 Credit to the sprite maker: [Reddit Page](https://www.reddit.com/r/PixelArt/comments/23m4hs/ocwipcc_some_rpgdungeon_crawler_sprites_im/) (Some tweaks were made for sizing)
 
 #### TODO
-- Make player face movement direction
-- Add enemies 
+- *DONE: * Make player face movement direction
+- *Done: *Add enemies 
+- Keep this list up-to-date
+- Player health & death
+- More enemies
+- More rooms
+    - Each player and enemy will be assigned a 'room' value ect.
 - Add screen prompting you to enter the ip
 - Disallow player movement before connection to the server is established
 - More textures more awesome
