@@ -1,17 +1,18 @@
 # Multiplayer-RPG
 Base code was downloaded from: [Rawkes](http://rawkes.com/articles/creating-a-real-time-multiplayer-game-with-websockets-and-node.html) (After following the tutorial)        
-Credit to the sprite maker: [Reddit Page](https://www.reddit.com/r/PixelArt/comments/23m4hs/ocwipcc_some_rpgdungeon_crawler_sprites_im/) (Some tweaks were made for sizing)
+Credit to the sprite creator: [Reddit Page](https://www.reddit.com/r/PixelArt/comments/23m4hs/ocwipcc_some_rpgdungeon_crawler_sprites_im/) (Some tweaks were made for sizing)
+Credit to another sprite creator: [OpenGameArt](http://opengameart.org/content/dungeon-crawl-32x32-tiles) (Again, **minor** tweaks for tesselation and size)
 
 #### TODO
 - *DONE: * Make player face movement direction
 - *Done: *Add enemies 
+- *DONE: *Disallow player movement before connection to the server is established
 - Keep this list up-to-date
 - Player health & death
 - More enemies
 - More rooms
     - Each player and enemy will be assigned a 'room' value ect.
 - Add screen prompting you to enter the ip
-- Disallow player movement before connection to the server is established
 - More textures more awesome
 
 *Sorry for the huge gifs!*

@@ -6,6 +6,7 @@ var Enemy = function(startX, startY, ID) {
 		prevAttacking = false,
         health = 30,
         maxHealth = 30,
+        lastMoveX = false, // Alternate between x & y plane movement
 		id = ID;
 	
 	// Getters and setters
@@ -51,7 +52,7 @@ var Enemy = function(startX, startY, ID) {
     
     var takeDamage = function(dam) {
         health -= dam;
-        if (health < 0){ return false; }
+        if (health <= 0){ return false; }
         return true;
     }
     
@@ -74,10 +75,10 @@ var Enemy = function(startX, startY, ID) {
 		y = ret[1];
 		
 		// OOB checking
-		if (y > 500){ y = 500; }
-		else if (y < 0){ y = 0; }
-		if (x > 500){ x = 500; }
-		else if (x < 0){ x = 0; }
+		if (y > 550){ y = 550; }
+		else if (y < 50){ y = 50; }
+		if (x > 550){ x = 550; }
+		else if (x < 50){ x = 50; }
 		
 		var move = false;
 		if (prevX != x || prevY != y){ move = true; }
@@ -122,10 +123,19 @@ var Enemy = function(startX, startY, ID) {
 			}
 		}
 		if (closest == -1){ return [x, y]; }
-		if (players[closest].getX() < x){ x -= 50; }
-		else if (players[closest].getX() > x){ x += 50; }
-		else if (players[closest].getY() < y){ y -= 50; }
-		else if (players[closest].getY() > y){ y += 50; }
+        if (!lastMoveX) {
+		    if (players[closest].getX() < x){ x -= 50; }
+		    else if (players[closest].getX() > x){ x += 50; }
+		    else if (players[closest].getY() < y){ y -= 50; }
+		    else if (players[closest].getY() > y){ y += 50; }
+            lastMoveX = true;
+        } else {
+		    if (players[closest].getY() < y){ y -= 50; }
+		    else if (players[closest].getY() > y){ y += 50; }
+            else if (players[closest].getX() < x){ x -= 50; }
+		    else if (players[closest].getX() > x){ x += 50; }
+            lastMoveX = false;
+        }
 		return [x, y];
 	}
 

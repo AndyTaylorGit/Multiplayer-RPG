@@ -28,10 +28,29 @@ function init() {
 	// Set up Socket.IO to listen on port 8000
 	socket = io.listen(8000);
 
-	all_objects.push(new Wall(50, 50));
-	all_objects.push(new Wall(100, 50));
-	all_objects.push(new Wall(50, 100));
-	all_objects.push(new Enemy(100, 100, newObjectID()));
+	all_objects.push(new Wall(100, 100));
+	all_objects.push(new Wall(150, 100));
+	all_objects.push(new Wall(100, 150));
+    
+    all_objects.push(new Wall(500, 100));
+	all_objects.push(new Wall(450, 100));
+	all_objects.push(new Wall(500, 150));
+    
+    all_objects.push(new Wall(500, 450));
+	all_objects.push(new Wall(450, 500));
+	all_objects.push(new Wall(500, 500));
+    
+    all_objects.push(new Wall(100, 500));
+	all_objects.push(new Wall(150, 500));
+	all_objects.push(new Wall(100, 450));
+    
+    all_objects.push(new Wall(300, 300));
+    all_objects.push(new Wall(350, 300));
+    all_objects.push(new Wall(250, 300));
+    all_objects.push(new Wall(300, 350));
+    all_objects.push(new Wall(300, 250));
+    
+	all_objects.push(new Enemy(150, 150, newObjectID()));
 
 	// Start listening for events
 	setEventHandlers();
@@ -87,7 +106,7 @@ function attackPlayer(data) {
 	
 	attackPlayer.setAttacking(data.attack);
 	if (data.attack){
-		for (var i = 0; i < players.length; i++){
+		/*for (var i = 0; i < players.length; i++){
 			var player = players[i];
 			if (player.id == this.id){ continue; }
 			if (player.getY() == attackPlayer.getY() && player.getX()-50 == attackPlayer.getX()){
@@ -97,7 +116,7 @@ function attackPlayer(data) {
 				this.emit("move player", {id: player.id, x: 250, y:500});
 				break;
 			}
-		}
+		}*/ // Friendly fire???
         
         for (var i = 0; i < all_objects.length; i++){
             var o = all_objects[i];

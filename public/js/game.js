@@ -7,7 +7,8 @@ var canvas,			// Canvas DOM element
 	localPlayer,	// Local player
 	remotePlayers,	// Remote players
 	socket,
-	all_objects;			// Socket connection
+	all_objects,
+    connected = false;			// Socket connection
 
 
 /**************************************************
@@ -17,6 +18,8 @@ function init() {
 	// Declare the canvas and rendering context
 	canvas = document.getElementById("gameCanvas");
 	ctx = canvas.getContext("2d");
+    
+    
 
 	// Maximise the canvas
 	canvas.width = window.innerWidth;
@@ -28,8 +31,8 @@ function init() {
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
 	// placed right on the egde of the screen
-	var startX = Math.round(250),
-		startY = Math.round(500);
+	var startX = Math.round(300),
+		startY = Math.round(550);
 
 	// Initialise the local player
 	localPlayer = new Player(startX, startY);
@@ -148,6 +151,7 @@ function damageObject(data) {
 function onSocketConnected() {
 	console.log("Connected to socket server");
 
+    connected = true;
 	// Send local player data to the game server
 	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY()});
 };
@@ -158,6 +162,7 @@ function setLocalID(data) {
 
 // Socket disconnected
 function onSocketDisconnect() {
+    connected = false;
 	console.log("Disconnected from socket server");
 	remotePlayers = [];
 	all_objects = [];
@@ -237,6 +242,7 @@ function animate() {
 **************************************************/
 function update() {
 	// Update local player and check for change
+    if (!connected){ return; }
 	var ret = localPlayer.update(keys, remotePlayers)
 	if (ret[0] || ret[2]) {
 		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), facing: localPlayer.getFacing()});
@@ -250,19 +256,21 @@ function update() {
 ** GAME DRAW
 **************************************************/
 function draw() {
+    initialRender();
 	// Wipe the canvas clean
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.clearRect(50, 50, 550, 550);
 	
-	ctx.strokeRect(0, 0, 550, 550); ctx.strokeRect(0, 0, 550, 550);
+	ctx.strokeRect(50, 50, 550, 550); ctx.strokeRect(50, 50, 550, 550);
 	for (var x = 0; x < 11; x++){
 		for (var y = 0; y < 11; y++){
 			if (y % 2 == 0 && x % 2 == 0){
-				ctx.strokeRect(x*50, y*50, 50, 50);
+				ctx.strokeRect(x*50+50, y*50+50, 50, 50);
 			} else if (y % 2 != 0 && x % 2 != 0) {
-				ctx.strokeRect(x*50, y*50, 50, 50);
+				ctx.strokeRect(x*50+50, y*50+50, 50, 50);
 			}
 		}
 	}
+    
 	
 	// Draw the local player
 	localPlayer.draw(ctx);
@@ -275,6 +283,27 @@ function draw() {
 	for (i = 0; i < all_objects.length; i++) {
 		all_objects[i].draw(ctx);
 	}
+};
+
+function initialRender() {
+    var stone = new Image();
+    var stoneVert = new Image();
+    var stoneCorner = new Image();
+    stone.src = "pics/stone wall.png";
+    stoneVert.src = "pics/stone vert.png";
+    stoneCorner.src = "pics/stone corner.png";
+    
+    for (var x = 0; x < 13; x++){
+        for (var y = 0; y < 13; y++){
+            if ((x == 12 && y == 12) || (x == 12 && y == 0) || (x == 0 && y == 0) || (x == 0 && y == 12)){
+                ctx.drawImage(stoneCorner, 50*x, 50*y, 50, 50);
+            } else if (y == 0 || y == 12){
+                ctx.drawImage(stone, 50*x, 50*y, 50, 50);
+            } else if (x == 0 || x == 12){
+                ctx.drawImage(stoneVert, 50*x, 50*y, 50, 50);
+            }
+        }
+    }
 };
 
 

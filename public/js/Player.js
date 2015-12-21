@@ -91,10 +91,10 @@ var Player = function(startX, startY) {
 		else { attacking = false; }
 		
 		// OOB checking
-		if (y > 500){ y = 500; }
-		else if (y < 0){ y = 0; }
-		if (x > 500){ x = 500; }
-		else if (x < 0){ x = 0; }
+		if (y > 550){ y = 550; }
+		else if (y < 50){ y = 50; }
+		if (x > 550){ x = 550; }
+		else if (x < 50){ x = 50; }
 		
 		var move = false, 
             changeFace = false,
