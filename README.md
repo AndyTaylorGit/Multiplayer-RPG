@@ -12,8 +12,26 @@ Credit to another sprite creator: [OpenGameArt](http://opengameart.org/content/d
     - Each player and enemy will be assigned a 'room' value ect.
     - Doors are cool, really cool
 - Design a bunch of levels
-- Player health & death
+- *DONE: *Player health & death
 - Add screen prompting you to enter the ip
+- *DONE: *Add Archer Class (Trek)
+- Add Weapons
+- Add Team System
+- Fix damage values
+
+#### THINKING 'BOUT STRUCTURE
+- Once a room is empty of players it should be 'reset'
+    - Enemies Regenerated
+    - Loot Regenerated (randomized)
+- Players should drop an item or two on death
+    - Flip side of this is it could get really annoying
+        - Different spawns for every team
+        - Huge Map
+        - **:O TEAM BASES**!!! Shit yes
+            - Storage
+            - Monster spawner to grind out XP SLOWLY
+            - Either locked out to other teams or they get damage reductions (minecraft factions)
+            
 
 *Sorry for the huge gifs!*
 

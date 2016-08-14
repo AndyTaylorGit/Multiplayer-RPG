@@ -1,7 +1,7 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Player = function(startX, startY, st, n, C) {
+var Player = function(startX, startY, st, n, C, Team) {
 	var x = startX,
 		y = startY,
 		moveAmount = 50,
@@ -24,6 +24,7 @@ var Player = function(startX, startY, st, n, C) {
 		Class = C,
 		images = [],
 		attackImages = [],
+		team = Team,
 		stage = st;
 
 	var classes = ["hero", "archer"];
@@ -231,8 +232,11 @@ var Player = function(startX, startY, st, n, C) {
 		}
 		ctx.drawImage(i, x-diff, y);
 
-		ctx.font = "15px Arial";
 		ctx.fillStyle = "#000000";
+		if (team == "blue"){ ctx.fillStyle = "#0000FF"; }
+		else if (team == "red"){ ctx.fillStyle = "#FF0000"; }
+		else if (team == "green"){ ctx.fillStyle = "#00FF00"; }
+		ctx.font = "15px Arial";
 		if (name == "Andy"){ ctx.fillStyle = rainbow; }
 		ctx.fillText(name, x, y-5);
 	};
@@ -265,6 +269,14 @@ var Player = function(startX, startY, st, n, C) {
 		return maxHealth;
 	}
 
+	var setTeam = function(Team){
+		team = Team;
+	}
+
+	var getTeam = function(){
+		return team;
+	}
+
 
 	// Define which variables and methods can be accessed
 	return {
@@ -289,6 +301,8 @@ var Player = function(startX, startY, st, n, C) {
 		getName: getName,
 		getClass: getClass,
 		setClass: setClass,
+		setTeam: setTeam,
+		getTeam: getTeam,
 		setName: setName
 	}
 };

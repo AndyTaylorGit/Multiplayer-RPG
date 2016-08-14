@@ -1,7 +1,7 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Player = function(startX, startY, Stage, n, C) {
+var Player = function(startX, startY, Stage, n, C, Team) {
 	var x = startX,
 		y = startY,
 		stage = Stage,
@@ -14,6 +14,7 @@ var Player = function(startX, startY, Stage, n, C) {
 		god = false,
 		kills = 0,
 		Class = C,
+		team = Team,
 		rect = {x: startX, y: startY, width: 50, height: 50},
 		id;
 
@@ -125,6 +126,14 @@ var Player = function(startX, startY, Stage, n, C) {
 		return id;
 	}
 
+	var getTeam = function(){
+		return team;
+	}
+
+	var setTeam = function(Team){
+		team = Team;
+	}
+
 	// Define which variables and methods can be accessed
 	return {
 		getX: getX,
@@ -153,6 +162,8 @@ var Player = function(startX, startY, Stage, n, C) {
 		getClass: getClass,
 		setClass: setClass,
 		getId: getId,
+		getTeam: getTeam,
+		setTeam: setTeam,
 		id: id
 	}
 };

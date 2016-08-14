@@ -7,7 +7,8 @@ var util = require("util"),					// Utility resources (logging, object inspection
 	Enemy = require("./Enemy").Enemy,
 	Wall = require("./Wall").Wall,
 	Door = require("./Door").Door,
-	Arrow = require("./Arrow").Arrow;
+	Arrow = require("./Arrow").Arrow,
+	SpawnPad = require("./SpawnPad").SpawnPad;
 
 
 /**************************************************
@@ -338,21 +339,30 @@ function onNewPlayer(data) {
 		n++;
 		n = n.toString();
 	}
-	var newPlayer = new Player(data.x, data.y, 1, n, data.Class);
+	var newPlayer = new Player(data.x, data.y, 1, n, data.Class, data.team);
 	newPlayer.id = this.id;
 
 	this.emit("set local id", {id: this.id});
 	this.emit("player name", {id: this.id, name: n});
 
+	for (var i = 0; i < all_objects.length; i++){
+		if (all_objects[i].getClass() == "spawnpad" && all_objects[i].getTeam() == newPlayer.getTeam()){
+			var ret = all_objects[i].getSpawn();
+			newPlayer.setX(ret[0]);
+			newPlayer.setY(ret[1]);
+			newPlayer.setStage(ret[2]);
+		}
+	}
+	this.emit("move player", {id: this.id, x: newPlayer.getX(), y: newPlayer.getY(), stage: newPlayer.getStage(), facing: 1});
 
 	// Broadcast new player to connected socket clients
-	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), stage: newPlayer.getStage(), name: newPlayer.getName(), Class: newPlayer.getClass()});
+	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), stage: newPlayer.getStage(), name: newPlayer.getName(), Class: newPlayer.getClass(), team: newPlayer.getTeam()});
 
 	// Send existing players to the new player
 	var i, existingPlayer;
 	for (i = 0; i < players.length; i++) {
 		existingPlayer = players[i];
-		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), stage: existingPlayer.getStage(), name: existingPlayer.getName(), Class: existingPlayer.getClass()});
+		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), stage: existingPlayer.getStage(), name: existingPlayer.getName(), Class: existingPlayer.getClass(), team: existingPlayer.getTeam()});
 	};
 
 	for (i = 0; i < all_objects.length; i++){
@@ -365,6 +375,8 @@ function onNewPlayer(data) {
 			this.emit("new door", {x: object.getX(), y: object.getY(), x2: object.getX2(), y2: object.getY2(), s1: object.getStage(), s2: object.getStage2()});
 		} else if (object.getClass() == "arrow"){
 			this.emit("new arrow", {x: object.getX(), y: object.getY(), id: object.getId(), stage: object.getStage()});
+		} else if (object.getClass() == "spawnpad"){
+			this.emit("new spawnpad", {x: object.getX(), y: object.getY(), w: object.getWidth(), h: object.getHeight(), stage: object.getStage(), team: object.getTeam()});
 		}
 	}
 
@@ -406,33 +418,17 @@ function onMovePlayer(data) {
 };
 
 function loadAllStages(){
-	all_objects.push(new Wall(100, 100, 1));
+	/*all_objects.push(new Wall(100, 100, 1));
 	all_objects.push(new Wall(150, 100, 1));
 	all_objects.push(new Wall(100, 150, 1));
-
-  	all_objects.push(new Wall(500, 100, 1));
-	all_objects.push(new Wall(450, 100, 1));
-	all_objects.push(new Wall(500, 150, 1));
-
-  	all_objects.push(new Wall(500, 450, 1));
-	all_objects.push(new Wall(450, 500, 1));
-	all_objects.push(new Wall(500, 500, 1));
-
-  	all_objects.push(new Wall(100, 500, 1));
-	all_objects.push(new Wall(150, 500, 1));
-	all_objects.push(new Wall(100, 450, 1));
-
-  	all_objects.push(new Wall(300, 300, 2));
-  	all_objects.push(new Wall(350, 300, 2));
-  	all_objects.push(new Wall(250, 300, 2));
-  	all_objects.push(new Wall(300, 350, 2));
-  	all_objects.push(new Wall(300, 250, 2));
-
-  	all_objects.push(new Door(300, 0, 300, 600, 1, 2));
-	all_objects.push(new Door(600, 300, 0, 300, 2, 3));
-
 	all_objects.push(new Enemy(150, 150, newObjectID(), 1));
-	all_objects.push(new Enemy(450, 150, newObjectID(), 1));
+	all_objects.push(new Door(300, 0, 300, 600, 1, 2));*/
+	all_objects.push(new Door(600, 300, 0, 300, 1, 2));
+	all_objects.push(new Door(600, 300, 0, 300, 2, 3));
+	all_objects.push(new Door(600, 300, 0, 300, 3, 4));
+	all_objects.push(new Door(600, 300, 0, 300, 4, 5));
+	all_objects.push(new SpawnPad(50, 50, 150, 150, 1, "blue"));
+	all_objects.push(new SpawnPad(450, 50, 150, 150, 5, "green"));
 }
 
 

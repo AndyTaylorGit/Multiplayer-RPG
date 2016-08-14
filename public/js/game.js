@@ -50,7 +50,7 @@ function init() {
 	while (name.toLowerCase() == "andy" || name.toLowerCase() == "you"){
 		name = prompt("No you don't, choose again!");
 	}*/
-	localPlayer = new Player(startX, startY, 1, "", "hero");
+	localPlayer = new Player(startX, startY, 1, "", "hero", "green");
 
 	// Initialise socket connection
 	socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
@@ -110,6 +110,8 @@ var setEventHandlers = function() {
 	// New Enemy
 	socket.on("new enemy", newEnemy);
 
+	socket.on("new spawnpad", onNewSpawnPad);
+
 	socket.on("move enemy", moveEnemy);
 
     socket.on("damage object", damageObject);
@@ -158,6 +160,10 @@ function onNewArrow(data){
 	if (!objectById(data.id)){
 		all_objects.push(new Arrow(data.x, data.y, data.stage, data.id));
 	}
+}
+
+function onNewSpawnPad(data){
+	all_objects.push(new SpawnPad(data.x, data.y, data.w, data.h, data.stage, data.team));
 }
 
 function onPlayerClass(data){
@@ -262,7 +268,7 @@ function onSocketConnected() {
 	messages.push({msg: "Connected!", type: 0});
     connected = true;
 	// Send local player data to the game server
-	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY(), Class: localPlayer.getClass()});
+	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY(), Class: localPlayer.getClass(), team: localPlayer.getTeam()});
 };
 
 function setLocalID(data) {
@@ -288,7 +294,7 @@ function onNewPlayer(data) {
 	console.log("New player connected: "+data.id);
 
 	// Initialise the new player
-	var newPlayer = new Player(data.x, data.y, data.stage, data.name, data.Class);
+	var newPlayer = new Player(data.x, data.y, data.stage, data.name, data.Class, data.team);
 	newPlayer.setId(data.id);
 
 	for (var i = 0; i < remotePlayers.length; i++){
@@ -423,15 +429,7 @@ function draw() {
 	rainbowTick++;
 	if (rainbowTick > 50){ rainbowTick = 0; rainbowIndex++; }
 	if (rainbowIndex >= rainbow.length){ rainbowIndex = 0; }
-	// Draw the local player
-	localPlayer.draw(ctx, rainbow[rainbowIndex]);
 
-	// Draw the remote players
-	var i;
-	for (i = 0; i < remotePlayers.length; i++) {
-		if (remotePlayers[i].getStage() != localPlayer.getStage()){ continue; }
-		remotePlayers[i].draw(ctx, rainbow[rainbowIndex]);
-	};
 	for (i = 0; i < all_objects.length; i++) {
 		if (all_objects[i].getStage() != localPlayer.getStage() && all_objects[i].getClass() != "door"){ continue; }
 		if (all_objects[i].getClass() == "door" && !(localPlayer.getStage() == all_objects[i].getStage() || localPlayer.getStage() == all_objects[i].getStage2())){ continue; }
@@ -441,6 +439,16 @@ function draw() {
 			all_objects[i].draw(ctx);
 		}
 	}
+
+	// Draw the local player
+	localPlayer.draw(ctx, rainbow[rainbowIndex]);
+
+	// Draw the remote players
+	var i;
+	for (i = 0; i < remotePlayers.length; i++) {
+		if (remotePlayers[i].getStage() != localPlayer.getStage()){ continue; }
+		remotePlayers[i].draw(ctx, rainbow[rainbowIndex]);
+	};
 
 	ctx.fillStyle="#888888";
 	ctx.fillRect(650, 0, 200, 650);
