@@ -1,7 +1,7 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Enemy = function(startX, startY, ID) {
+var Enemy = function(startX, startY, ID, st) {
 	var x = startX,
 		y = startY,
 		moveAmount = 50,
@@ -10,13 +10,14 @@ var Enemy = function(startX, startY, ID) {
         health = 30,
         maxHealth = 30,
 		img,
-		attackImg;
-		
+		attackImg,
+		stage = st;
+
 	img = new Image();
 	attackImg = new Image();
 	img.src = "pics/slime.png";
 	attackImg.src = "pics/slime.png";
-	
+
 	// Getters and setters
 	var getX = function() {
 		return x;
@@ -33,7 +34,7 @@ var Enemy = function(startX, startY, ID) {
 	var setY = function(newY) {
 		y = newY;
 	};
-	
+
 	var setId = function(newId) {
 		id = newId;
 	};
@@ -41,25 +42,25 @@ var Enemy = function(startX, startY, ID) {
 	var getId = function() {
 		return id;
 	};
-	
+
 	var setAttacking = function(att) {
 		attacking = att;
 	};
-	
+
 	var getAttacking = function() {
 		return attacking;
 	};
-    
+
     var getHealth = function() {
         return health;
     }
-    
+
     var takeDamage = function(damage) {
         health -= damage;
         if (health <= 0){ return false; }
         return true;
     }
-    
+
     var getMaxHealth = function() {
         return maxHealth;
     }
@@ -70,6 +71,18 @@ var Enemy = function(startX, startY, ID) {
         ctx.fillStyle="#FF0000";
         ctx.fillRect(x+1, y+1, (48/30)*health, 10);
 	};
+
+	var getStage = function() {
+		return stage;
+	}
+
+	var setStage = function(st) {
+		stage = st;
+	}
+
+	var getClass = function() {
+		return "enemy";
+	}
 
 	// Define which variables and methods can be accessed
 	return {
@@ -84,6 +97,9 @@ var Enemy = function(startX, startY, ID) {
         takeDamage: takeDamage,
         getMaxHealth: getMaxHealth,
 		setId: setId,
-		getId: getId
+		getId: getId,
+		getStage: getStage,
+		setStage: setStage,
+		getClass: getClass
 	}
 };

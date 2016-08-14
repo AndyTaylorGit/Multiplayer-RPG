@@ -1,12 +1,13 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Wall = function(startX, startY) {
+var Wall = function(startX, startY, st) {
 	var x = startX,
 		y = startY,
-		id, 
-		img;
-	
+		id,
+		img,
+		stage = st;
+
 	img = new Image();
 	img.src = "pics/crate.png";
 	// Getters and setters
@@ -25,10 +26,22 @@ var Wall = function(startX, startY) {
 	var setY = function(newY) {
 		y = newY;
 	};
-	
+
 	var draw = function(ctx) {
 		ctx.drawImage(img, x, y, 50, 50);
 	};
+
+	var getStage = function() {
+		return stage;
+	};
+
+	var setStage = function(st) {
+		stage = st;
+	}
+
+	var getClass = function() {
+		return "wall";
+	}
 
 	// Define which variables and methods can be accessed
 	return {
@@ -37,6 +50,9 @@ var Wall = function(startX, startY) {
 		setX: setX,
 		setY: setY,
 		id: id,
-		draw: draw
+		draw: draw,
+		getStage: getStage,
+		setStage: setStage,
+		getClass: getClass
 	}
 };

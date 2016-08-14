@@ -1,0 +1,37 @@
+# Theory
+
+### The operating system
+***How and Why***
+Computers are comprised of layers of abstraction. The lowest layer of a computer is made up of electrical components. Things like transistors, resistors and capacitors. The next layer is the OS of the computers. This provides certain interfaces for each piece of hardware and acts as a general overlay, allow different sets of hardware to be controlled by the same OS and saving a lot of time in both programming and the production of computers (I believe Linux was the first OS capable of functioning on multiple types of computers).
+
+***Application and Utility Software***
+Utility software is designed to analyse or to generally help maintain a computer. A single piece of this software is often called a utility or ‘tool’. These are usually extremely minimal when it comes to UI because their sole purpose is to ‘get the job done’. Application software is software designed specifically for the user. They are usually rich in UI and are designed around ease of use.
+
+***Timeline***
+Mac OSX: 2000 public beta was named Kodiak
+Linux: 1991 version 0.01 was released on ftp server
+Windows: 1985, November 20
+Unix: November 3rd, 1971
+Xerox: Founded in 1906
+DOS: 1981
+
+***Key People***
+Me, Me and Me. No You.
+
+***Development of GUI***
+1973 - First Alto computer with graphical interface
+     - 3 Mouse buttons
+     - Bit-Mapped display
+
+1980 - Three rivers computer corporation
+     - Improved graphics and faster processing
+
+1981 - Xerox introduces Star
+     - Double-clickable icons
+     - Overlapping windows
+
+1983 - Apple introduces Lisa
+     - Pulldown Menus
+
+1984 - Apple introduces Macintosh
+     - From here it is mainly cpu and size advancements

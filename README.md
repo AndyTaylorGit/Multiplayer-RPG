@@ -5,15 +5,15 @@ Credit to another sprite creator: [OpenGameArt](http://opengameart.org/content/d
 
 #### TODO
 - *DONE: * Make player face movement direction
-- *Done: *Add enemies 
+- *DONE: *Add enemies
+- *DONE: *Allow player to attack
 - *DONE: *Disallow player movement before connection to the server is established
-- Keep this list up-to-date
-- Player health & death
-- More enemies
-- More rooms
+- *DONE: *More rooms
     - Each player and enemy will be assigned a 'room' value ect.
+    - Doors are cool, really cool
+- Design a bunch of levels
+- Player health & death
 - Add screen prompting you to enter the ip
-- More textures more awesome
 
 *Sorry for the huge gifs!*
 
@@ -21,7 +21,7 @@ Credit to another sprite creator: [OpenGameArt](http://opengameart.org/content/d
 ![](/ReadmeStuff/Orig.gif)
 
 
-**Current Game: (Works across multiple computers)**
+**[No Longer The] Current Game: (Works across multiple computers)**
 ![](/ReadmeStuff/Game.gif)
 
 **Creating The Main Server:**     

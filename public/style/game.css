@@ -5,3 +5,10 @@ body {
 canvas {
 	display: block;
 }
+
+@font-face {
+    font-family: 'Block';
+    src: local('pics/OBGB.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

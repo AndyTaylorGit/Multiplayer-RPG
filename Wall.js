@@ -1,9 +1,10 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Wall = function(startX, startY) {
+var Wall = function(startX, startY, Stage) {
 	var x = startX,
 		y = startY,
+		stage = Stage,
 		id;
 
 	// Getters and setters
@@ -22,11 +23,15 @@ var Wall = function(startX, startY) {
 	var setY = function(newY) {
 		y = newY;
 	};
-	
+
 	var getId = function() {
 		return -1;
 	}
-	
+
+	var getStage = function() {
+		return stage;
+	}
+
 	var getClass = function(){
 		return "wall";
 	}
@@ -38,6 +43,7 @@ var Wall = function(startX, startY) {
 		setX: setX,
 		setY: setY,
 		getId: getId,
+		getStage: getStage,
 		id: id,
 		getClass: getClass
 	}
