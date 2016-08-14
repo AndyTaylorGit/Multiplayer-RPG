@@ -66,17 +66,19 @@ function update() {
 				socket.sockets.emit("move object", {x: object.getX(), y: object.getY(), id: object.getId()});
 			} if (hit.id != -1){
 				var pl = playerById(hit.id);
-				if (!pl.takeDamage(hit.damage)){
-					pl.setHealth();
-					pl.setX(300);
-					pl.setY(550);
-					pl.setStage(1);
-					socket.sockets.emit("move player", {id: pl.id, x:300, y:550, facing: 1, stage: 1});
-					socket.sockets.emit("damage player", {id: pl.id, damage: -30});
-					socket.sockets.emit("server msg", {string: "Enemy killed " + pl.getName(), type:0 });
-				} else {
-					socket.sockets.emit("damage player", {id: pl.id, damage: hit.damage});
-				}
+				if (!pl.getGod()) {
+					if (!pl.takeDamage(hit.damage)){
+						pl.setHealth();
+						pl.setX(300);
+						pl.setY(550);
+						pl.setStage(1);
+						socket.sockets.emit("move player", {id: pl.id, x:300, y:550, facing: 1, stage: 1});
+						socket.sockets.emit("damage player", {id: pl.id, damage: -30});
+						socket.sockets.emit("server msg", {string: "Enemy killed " + pl.getName(), type:0 });
+					} else {
+						socket.sockets.emit("damage player", {id: pl.id, damage: hit.damage});
+					}
+		 		}
 			}
 		} else if (object.getClass() == "arrow"){
 			var ret = object.update(players, all_objects);
@@ -85,9 +87,9 @@ function update() {
 			var hit = ret[2];
 			for (var p = 0; p < players.length; p++){
 				var pl = players[p];
+				if (pl.getGod()){ continue; }
 				if (pl.getStage() != object.getStage()){ continue; }
 				if (collision(pl.getX(), pl.getY(), object.getX(), object.getY()) && pl != playerById(object.getOId())){
-					console.log("LOG: " + pl.getId() + ":" + object.getOId());
 					if (!pl.takeDamage(10)){
 						pl.setHealth();
 						pl.setX(300);
@@ -208,13 +210,17 @@ function onCommand(data){
 			if (p.getAdmin()) {
 				var n = data.string.substring(5, 10);
 				var dp = playerByName(n);
-				dp.setHealth();
-				dp.setX(300);
-				dp.setY(550);
-				dp.setStage(1);
-				socket.sockets.emit("damage player", {id: dp.id, damage: -(30-dp.getHealth())});
-				socket.sockets.emit("move player", {id: dp.id, x: 300, y:550, facing: 1, stage: 1});
-				socket.sockets.emit("server msg", {string: "Server killed " + dp.getName(), type: 2});
+				if (!dp){
+					this.emit("server msg", {string: "Invalid Player.", type: 3});
+				} else {
+					dp.setHealth();
+					dp.setX(300);
+					dp.setY(550);
+					dp.setStage(1);
+					socket.sockets.emit("damage player", {id: dp.id, damage: -(30-dp.getHealth())});
+					socket.sockets.emit("move player", {id: dp.id, x: 300, y:550, facing: 1, stage: 1});
+					socket.sockets.emit("server msg", {string: "Server killed " + dp.getName(), type: 2});
+				}
 			} else {
 				this.emit("server msg", {string: "Bad Permissions.", type: 3});
 			}
@@ -226,9 +232,34 @@ function onCommand(data){
 			socket.sockets.emit("player class", {Class: c, id: this.id});
 			var classPlayer = playerById(this.id);
 			classPlayer.setClass(c);
-		} else if (data.string.substring(0, 5) == "spawn" && p.getAdmin()){
-			if (spawning){ spawning = false; }
-			else{ spawning = true; }
+		} else if (data.string.substring(0, 5) == "spawn") {
+			if (p.getAdmin()) {
+				if (spawning){ spawning = false; }
+				else{ spawning = true; }
+			} else {
+				this.emit("server msg", {string: "Bad Permissions.", type: 3});
+			}
+		} else if (data.string.substring(0, 4) == "help") {
+			this.emit("server msg", {string: "Type /name to change name", type: 2});
+			this.emit("server msg", {string: "Type /class to change class", type: 2});
+			if (p.getAdmin()){
+				this.emit("server msg", {string: "Type /god for god mode", type: 2});
+				this.emit("server msg", {string: "Type /kill [player] to kill", type: 2});
+				this.emit("server msg", {string: "Type /spawn to pause spawning", type: 2});
+			}
+		} else if (data.string.substring(0, 6) == "admin ") {
+			if (p.getAdmin()){
+				var n = data.string.substring(6, 11);
+				var dp = playerByName(n);
+				if (!dp){
+					this.emit("server msg", {string: "Invalid Name.", type: 3});
+				} else {
+					dp.setAdmin(true);
+					socket.sockets.emit("server msg", {string: n + " is now an admin.", type: 2});
+				}
+			} else {
+				this.emit("server msg", {string: "Bad Permissions.", type: 3});
+			}
 		} else {
 			this.emit("server msg", {string: "Command Not Found.", type: 3});
 		}

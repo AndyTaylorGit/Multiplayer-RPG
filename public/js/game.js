@@ -62,7 +62,7 @@ function init() {
 	rainbow = ["#FF0000", "#FF9900", "#FFFF00", "#33cc00", "#00cccc", "#0066cc", "#9933cc"];
 	messageFills = ["#FFFFFF", "#000000", "#00ff00", "#FF0000"];
 	messages.push({msg: "Connecting...", type: 0});
-	messages.push({msg: "Type /name [name] to change name", type: 2});
+	messages.push({msg: "Type /help for help", type: 2});
 
 	// Start listening for events
 	setEventHandlers();
