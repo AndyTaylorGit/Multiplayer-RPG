@@ -17,8 +17,8 @@ var util = require("util"),					// Utility resources (logging, object inspection
 var socket,		// Socket controller
 	players,
 	all_objects,
-	spawnticks = 0,
-	spawning = false,
+	ticks = 0,
+	spawning = true,
   objectID = 2000;	// Array of connected players
 
 
@@ -41,21 +41,7 @@ function init() {
 };
 
 function update() {
-	spawnticks += 1;
-	if (spawnticks % 75 == 0 && spawning){
-		var object = new Enemy(450, 150, newObjectID(), 1);
-		all_objects.push(object);
-		socket.sockets.emit("new enemy", {x: object.getX(), y: object.getY(), health: object.getHealth(), id: object.getId(), stage: object.getStage()});
-		object = new Enemy(150, 150, newObjectID(), 1);
-		all_objects.push(object);
-		socket.sockets.emit("new enemy", {x: object.getX(), y: object.getY(), health: object.getHealth(), id: object.getId(), stage: object.getStage()});
-		object = new Enemy(150, 450, newObjectID(), 1);
-		all_objects.push(object);
-		socket.sockets.emit("new enemy", {x: object.getX(), y: object.getY(), health: object.getHealth(), id: object.getId(), stage: object.getStage()});
-		object = new Enemy(450, 450, newObjectID(), 1);
-		all_objects.push(object);
-		socket.sockets.emit("new enemy", {x: object.getX(), y: object.getY(), health: object.getHealth(), id: object.getId(), stage: object.getStage()});
-	}
+	ticks += 1;
 	for (var i = 0; i < all_objects.length; i++){
 		var object = all_objects[i];
 		if (object.getClass() == "enemy"){
@@ -68,7 +54,7 @@ function update() {
 				var pl = playerById(hit.id);
 				if (!pl.getGod()) {
 					if (!pl.takeDamage(hit.damage)){
-						kill(pl);
+						kill(pl, "Enemy killed " + pl.getName());
 					} else {
 						socket.sockets.emit("damage player", {id: pl.id, damage: hit.damage});
 					}
@@ -85,7 +71,7 @@ function update() {
 				if (pl.getStage() != object.getStage()){ continue; }
 				if (collision(pl.getX(), pl.getY(), object.getX(), object.getY()) && pl != playerById(object.getOId())){
 					if (!pl.takeDamage(10)){
-						kill(pl);
+						kill(pl, "Arrow killed " + pl.getName());
 					} else {
 						socket.sockets.emit("damage player", {id: pl.id, damage: 10});
 					}
@@ -112,6 +98,18 @@ function update() {
 				} else {
 					socket.sockets.emit("move object", {x: object.getX(), y: object.getY(), id: object.getId()});
 				}
+			}
+		}
+	}
+
+	if (spawning && ticks % 50 == 0){
+		var stages = [];
+		for (var i = 0; i < players.length; i++){
+			stages.push(players[i].getStage());
+		}
+		for (var i = 0; i < 18; i++){
+			if (stages.indexOf(i) == -1){
+				loadEnemies(i);
 			}
 		}
 	}
@@ -171,7 +169,7 @@ function getSpawn(p){
 	}
 }
 
-function kill(pl){
+function kill(pl, msg){
 	var pos = getSpawn(pl);
 	pl.setHealth();
 	pl.setX(pos[0]);
@@ -179,7 +177,9 @@ function kill(pl){
 	pl.setStage(pos[2]);
 	socket.sockets.emit("move player", {id: pl.id, x:pos[0], y:pos[1], facing: 1, stage: pos[2]});
 	socket.sockets.emit("damage player", {id: pl.id, damage: -30});
-	socket.sockets.emit("server msg", {string: "arrow killed " + pl.getName(), type:0});
+	if (msg) {
+		socket.sockets.emit("server msg", {string: msg, type:0});
+	}
 }
 
 function onCommand(data){
@@ -239,6 +239,14 @@ function onCommand(data){
 			socket.sockets.emit("player class", {Class: c, id: this.id});
 			var classPlayer = playerById(this.id);
 			classPlayer.setClass(c);
+		} else if (data.string.substring(0, 5) == "team ") {
+			var t = data.string.substring(5).toLowerCase();
+			if (t != "blue" && t != "green"){ this.emit("server msg", {string: "Invalid Team.", type: 3}); return; }
+			this.emit("server msg", {string: "Team changed to " + t, type: 2});
+			socket.sockets.emit("change team", {team: t, id: this.id});
+			var tp = playerById(this.id);
+			tp.setTeam(t);
+			kill(tp);
 		} else if (data.string.substring(0, 5) == "spawn") {
 			if (p.getAdmin()) {
 				if (spawning){ spawning = false; }
@@ -249,6 +257,7 @@ function onCommand(data){
 		} else if (data.string.substring(0, 4) == "help") {
 			this.emit("server msg", {string: "Type /name to change name", type: 2});
 			this.emit("server msg", {string: "Type /class to change class", type: 2});
+			this.emit("server msg", {string: "Type /team [team] to change team", type: 2});
 			if (p.getAdmin()){
 				this.emit("server msg", {string: "Type /god for god mode", type: 2});
 				this.emit("server msg", {string: "Type /kill [player] to kill", type: 2});
@@ -278,6 +287,11 @@ function onCommand(data){
 	}
 }
 
+function delObject(id){
+	socket.sockets.emit("del object", {id: id});
+	all_objects.splice(all_objects.indexOf(objectById(id)), 1);
+}
+
 function attackPlayer(data) {
 	var attackPlayer = playerById(this.id);
 
@@ -301,7 +315,7 @@ function attackPlayer(data) {
 				if (o.getClass() == "door"){ continue; }
 	            if (checkHit(o, attackPlayer)){
 					if (!o.takeDamage(10)){
-						attackPlayer.addKill();
+						//attackPlayer.addKill();
 						all_objects.splice(all_objects.indexOf(o), 1);
 					}
 					socket.sockets.emit("damage object", {id: o.getId(), damage: 10});
@@ -313,8 +327,8 @@ function attackPlayer(data) {
 				if (player.id == this.id){ continue; }
 				if (checkHit(player, attackPlayer)){
 					if (!player.takeDamage(2)){
-						//attackPlayer.addKill();
-						kill(player);
+						attackPlayer.addKill();
+						kill(player, attackPlayer.getName() + " killed " + player.getName());
 					} else {
 						this.broadcast.emit("damage player", {id: player.id, damage: 2});
 						this.emit("damage player", {id: player.id, damage: 2});
@@ -335,7 +349,8 @@ function checkHit(o, attackPlayer){
 			}
 	}
 	if (attackPlayer.getY() == o.getY() && attackPlayer.getX() == o.getX()-(50*attackPlayer.getFacing()) && attackPlayer.getStage() == o.getStage()
-		&& (o.getX() != 300 || o.getY() != 550 || o.getStage() != 1) && (attackPlayer.getX() != 300 || attackPlayer.getY() != 550 || attackPlayer.getStage() != 1) && !o.getGod()){
+		&& (o.getX() != 300 || o.getY() != 550 || o.getStage() != 1) && (attackPlayer.getX() != 300 || attackPlayer.getY() != 550 || attackPlayer.getStage() != 1) && !o.getGod()
+		&& attackPlayer.getTeam() != o.getTeam()){
 		return true;
 	}
 	return false;
@@ -445,17 +460,54 @@ function onMovePlayer(data) {
 };
 
 function loadAllStages(){
-	/*all_objects.push(new Wall(100, 100, 1));
-	all_objects.push(new Wall(150, 100, 1));
-	all_objects.push(new Wall(100, 150, 1));
-	all_objects.push(new Enemy(150, 150, newObjectID(), 1));
-	all_objects.push(new Door(300, 0, 300, 600, 1, 2));*/
-	all_objects.push(new Door(600, 300, 0, 300, 1, 2));
-	all_objects.push(new Door(600, 300, 0, 300, 2, 3));
-	all_objects.push(new Door(600, 300, 0, 300, 3, 4));
-	all_objects.push(new Door(600, 300, 0, 300, 4, 5));
+	/*all_objects.push(new Wall(100, 100, 4));
+	all_objects.push(new Wall(150, 100, 4));
+	all_objects.push(new Wall(100, 150, 4));
+	all_objects.push(new Enemy(150, 150, newObjectID(), 4));
+	//all_objects.push(new Door(300, 0, 300, 600, 1, 2));*/
+
+
 	all_objects.push(new SpawnPad(50, 50, 150, 150, 1, "blue"));
-	all_objects.push(new SpawnPad(450, 50, 150, 150, 5, "green"));
+
+	all_objects.push(new Door(300, 600, 300, 0, 1, 9));
+	all_objects.push(new Door(600, 300, 0, 300, 1, 2));
+
+	all_objects.push(new Door(600, 300, 0, 300, 9, 10));
+	loadEnemies(9);
+
+	all_objects.push(new Wall(100, 100, 10));
+	all_objects.push(new Wall(150, 100, 10));
+	all_objects.push(new Wall(100, 150, 10));
+	all_objects.push(new Wall(450, 100, 10));
+	all_objects.push(new Wall(500, 100, 10));
+	all_objects.push(new Wall(500, 150, 10));
+	all_objects.push(new Wall(450, 500, 10));
+	all_objects.push(new Wall(500, 500, 10));
+	all_objects.push(new Wall(500, 450, 10));
+	all_objects.push(new Wall(100, 500, 10));
+	all_objects.push(new Wall(150, 500, 10));
+	all_objects.push(new Wall(100, 450, 10));
+	loadEnemies(10);
+}
+
+function loadEnemies(level) {
+	for (var i = 0; i < all_objects.length; i++){
+		if (all_objects[i].getClass() != "enemy"){ continue; }
+		if (all_objects[i].getStage() == level){ delObject(all_objects[i].getId()); }
+	}
+	if (level == 9) {
+		addEnemy(new Enemy(300, 300, newObjectID(), 9));
+	} else if (level == 10) {
+		addEnemy(new Enemy(150, 150, newObjectID(), 10));
+		addEnemy(new Enemy(450, 150, newObjectID(), 10));
+		addEnemy(new Enemy(450, 450, newObjectID(), 10));
+		addEnemy(new Enemy(150, 450, newObjectID(), 10));
+	}
+}
+
+function addEnemy(e){
+	all_objects.push(e);
+	socket.sockets.emit("new enemy", {x: e.getX(), y: e.getY(), id: e.getId(), health: e.getHealth(), stage: e.getStage()});
 }
 
 

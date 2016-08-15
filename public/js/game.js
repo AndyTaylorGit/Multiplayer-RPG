@@ -50,7 +50,7 @@ function init() {
 	while (name.toLowerCase() == "andy" || name.toLowerCase() == "you"){
 		name = prompt("No you don't, choose again!");
 	}*/
-	localPlayer = new Player(startX, startY, 1, "", "hero", "green");
+	localPlayer = new Player(startX, startY, 1, "", "hero", "blue");
 
 	// Initialise socket connection
 	socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
@@ -140,7 +140,15 @@ var setEventHandlers = function() {
 	socket.on("move object", moveObject);
 
 	socket.on("del object", deleteObject);
+
+	socket.on("change team", changeTeam);
 };
+
+function changeTeam(data){
+	var p = playerById(data.id);
+	if (!p){ return; }
+	p.setTeam(data.team);
+}
 
 function deleteObject(data){
 	var o = objectById(data.id);

@@ -42,8 +42,6 @@ var Player = function(startX, startY, st, n, C, Team) {
 	}
 
 
-
-
 	// Getters and setters
 	var getX = function() {
 		return x;
