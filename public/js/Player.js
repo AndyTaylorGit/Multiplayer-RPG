@@ -180,7 +180,7 @@ var Player = function(startX, startY, st, n, C, Team) {
 		}
 
 		for (var i = 0; i < all_objects.length; i++){
-			if (all_objects[i].getStage() != localPlayer.getStage() || all_objects[i].getClass() == "door" || all_objects[i].getClass() == "arrow"){ continue; }
+			if (all_objects[i].getStage() != localPlayer.getStage() || all_objects[i].getClass() == "door" || all_objects[i].getClass() == "arrow" || all_objects[i].getClass() == "spawnpad"){ continue; }
 			if (collision(all_objects[i].getX(), all_objects[i].getY())){
 				x = prevX;
 				y = prevY;

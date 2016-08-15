@@ -68,13 +68,7 @@ function update() {
 				var pl = playerById(hit.id);
 				if (!pl.getGod()) {
 					if (!pl.takeDamage(hit.damage)){
-						pl.setHealth();
-						pl.setX(300);
-						pl.setY(550);
-						pl.setStage(1);
-						socket.sockets.emit("move player", {id: pl.id, x:300, y:550, facing: 1, stage: 1});
-						socket.sockets.emit("damage player", {id: pl.id, damage: -30});
-						socket.sockets.emit("server msg", {string: "Enemy killed " + pl.getName(), type:0 });
+						kill(pl);
 					} else {
 						socket.sockets.emit("damage player", {id: pl.id, damage: hit.damage});
 					}
@@ -91,13 +85,7 @@ function update() {
 				if (pl.getStage() != object.getStage()){ continue; }
 				if (collision(pl.getX(), pl.getY(), object.getX(), object.getY()) && pl != playerById(object.getOId())){
 					if (!pl.takeDamage(10)){
-						pl.setHealth();
-						pl.setX(300);
-						pl.setY(550);
-						pl.setStage(1);
-						socket.sockets.emit("move player", {id: pl.id, x:300, y:550, facing: 1, stage: 1});
-						socket.sockets.emit("damage player", {id: pl.id, damage: -30});
-						socket.sockets.emit("server msg", {string: "arrow killed " + pl.getName(), type:0 });
+						kill(pl);
 					} else {
 						socket.sockets.emit("damage player", {id: pl.id, damage: 10});
 					}
@@ -173,6 +161,25 @@ function nameTaken(n){
 		if (players[i].getName() == n){ return true; }
 	}
 	return false;
+}
+
+function getSpawn(p){
+	for (var i = 0; i < all_objects.length; i++){
+		if (all_objects[i].getClass() == "spawnpad" && all_objects[i].getTeam() == p.getTeam()){
+			return all_objects[i].getSpawn()
+		}
+	}
+}
+
+function kill(pl){
+	var pos = getSpawn(pl);
+	pl.setHealth();
+	pl.setX(pos[0]);
+	pl.setY(pos[1]);
+	pl.setStage(pos[2]);
+	socket.sockets.emit("move player", {id: pl.id, x:pos[0], y:pos[1], facing: 1, stage: pos[2]});
+	socket.sockets.emit("damage player", {id: pl.id, damage: -30});
+	socket.sockets.emit("server msg", {string: "arrow killed " + pl.getName(), type:0});
 }
 
 function onCommand(data){
@@ -307,16 +314,7 @@ function attackPlayer(data) {
 				if (checkHit(player, attackPlayer)){
 					if (!player.takeDamage(2)){
 						//attackPlayer.addKill();
-						player.setHealth();
-						player.setX(300);
-						player.setY(550);
-						player.setStage(1);
-						this.broadcast.emit("move player", {id: player.id, x: 300, y:550, facing: 1, stage: 1});
-						this.emit("move player", {id: player.id, x: 300, y:550, facing: 1, stage: 1});
-						this.broadcast.emit("damage player", {id: player.id, damage: -30});
-						this.emit("damage player", {id: player.id, damage: -30});
-						this.broadcast.emit("server msg", {string: attackPlayer.getName() + " killed " + player.getName(), type: 0});
-						this.emit("server msg", {string: "You" + " killed " + player.getName(), type: 0});
+						kill(player);
 					} else {
 						this.broadcast.emit("damage player", {id: player.id, damage: 2});
 						this.emit("damage player", {id: player.id, damage: 2});
@@ -376,14 +374,12 @@ function onNewPlayer(data) {
 	this.emit("set local id", {id: this.id});
 	this.emit("player name", {id: this.id, name: n});
 
-	for (var i = 0; i < all_objects.length; i++){
-		if (all_objects[i].getClass() == "spawnpad" && all_objects[i].getTeam() == newPlayer.getTeam()){
-			var ret = all_objects[i].getSpawn();
-			newPlayer.setX(ret[0]);
-			newPlayer.setY(ret[1]);
-			newPlayer.setStage(ret[2]);
-		}
-	}
+
+	var ret = getSpawn(newPlayer);
+	newPlayer.setX(ret[0]);
+	newPlayer.setY(ret[1]);
+	newPlayer.setStage(ret[2]);
+
 	this.emit("move player", {id: this.id, x: newPlayer.getX(), y: newPlayer.getY(), stage: newPlayer.getStage(), facing: 1});
 
 	// Broadcast new player to connected socket clients
