@@ -102,15 +102,25 @@ function update() {
 		}
 	}
 
-	if (spawning && ticks % 50 == 0){
-		var stages = [];
-		for (var i = 0; i < players.length; i++){
-			stages.push(players[i].getStage());
-		}
-		for (var i = 0; i < 18; i++){
-			if (stages.indexOf(i) == -1){
-				loadEnemies(i);
+	if (spawning && ticks % 100 == 0){
+		for (var i = 1; i < 11; i++){
+			var skip = false;
+			for (var p = 0; p < players.length; p++){
+				if (players[p].getStage() == i){
+					skip = true;
+					break;
+				}
 			}
+			if (skip) { continue; }
+			var tod = [];
+			for (var o = 0; o < all_objects.length; o++){
+				if (all_objects[o].getClass() != "enemy" || all_objects[o].getStage() != i){ continue; }
+				tod.push(all_objects[o]);
+			}
+			for (var x = 0; x < tod.length; x++){
+				delObject(tod[x].getId());
+			}
+			loadEnemies(i);
 		}
 	}
 }
@@ -473,7 +483,6 @@ function loadAllStages(){
 	all_objects.push(new Door(600, 300, 0, 300, 1, 2));
 
 	all_objects.push(new Door(600, 300, 0, 300, 9, 10));
-	loadEnemies(9);
 
 	all_objects.push(new Wall(100, 100, 10));
 	all_objects.push(new Wall(150, 100, 10));
@@ -487,14 +496,9 @@ function loadAllStages(){
 	all_objects.push(new Wall(100, 500, 10));
 	all_objects.push(new Wall(150, 500, 10));
 	all_objects.push(new Wall(100, 450, 10));
-	loadEnemies(10);
 }
 
 function loadEnemies(level) {
-	for (var i = 0; i < all_objects.length; i++){
-		if (all_objects[i].getClass() != "enemy"){ continue; }
-		if (all_objects[i].getStage() == level){ delObject(all_objects[i].getId()); }
-	}
 	if (level == 9) {
 		addEnemy(new Enemy(300, 300, newObjectID(), 9));
 	} else if (level == 10) {

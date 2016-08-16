@@ -152,8 +152,7 @@ function changeTeam(data){
 
 function deleteObject(data){
 	var o = objectById(data.id);
-	if (!o){ return; }
-	console.log(all_objects.indexOf(o));
+	if (!o){ console.log("Cant find " + data.id); return; }
 	all_objects.splice(all_objects.indexOf(o), 1);
 }
 
@@ -215,10 +214,12 @@ function newDoor(data){
 }
 
 function newEnemy(data){
-	var e = new Enemy(data.x, data.y, data.id, data.stage);
-	if (e.takeDamage(e.getMaxHealth() - data.health)){
-        all_objects.push(e);
-    }
+	if (!objectById(data.id)){
+		var e = new Enemy(data.x, data.y, data.id, data.stage);
+		if (e.takeDamage(e.getMaxHealth() - data.health)){
+	        all_objects.push(e);
+	    }
+	} else { console.log("Already has enemy " + data.id); }
 }
 
 function moveEnemy(data){
